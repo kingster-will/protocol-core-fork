@@ -11,7 +11,7 @@ import { IPAccountChecker } from "../../../../contracts/lib/registries/IPAccount
 import { BaseModule } from "../../../../contracts/modules/BaseModule.sol";
 import { AccessControlled } from "../../../../contracts/access/AccessControlled.sol";
 
-contract MockTokenManagementModule is BaseModule, AccessControlled {
+contract MockExternalTokenTransferModule is BaseModule, AccessControlled {
     using ERC165Checker for address;
     using IPAccountChecker for IIPAccountRegistry;
 
@@ -26,7 +26,7 @@ contract MockTokenManagementModule is BaseModule, AccessControlled {
     }
 
     function name() external pure returns (string memory) {
-        return "MockTokenManagementModule";
+        return "MockExternalTokenTransferModule";
     }
 
     function transferERC721Token(

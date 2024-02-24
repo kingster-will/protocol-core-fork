@@ -7,7 +7,7 @@ import { Errors } from "../../contracts/lib/Errors.sol";
 
 import { MockModule } from "./mocks/module/MockModule.sol";
 import { MockOrchestratorModule } from "./mocks/module/MockOrchestratorModule.sol";
-import { MockTokenManagementModule } from "./mocks/module/MockTokenManagementModule.sol";
+import { MockExternalTokenTransferModule } from "./mocks/module/MockExternalTokenTransferModule.sol";
 import { MockERC1155 } from "./mocks/token/MockERC1155.sol";
 import { MockERC20 } from "./mocks/token/MockERC20.sol";
 import { BaseTest } from "./utils/BaseTest.t.sol";
@@ -1526,12 +1526,12 @@ contract AccessControllerTest is BaseTest {
 
         address anotherAccount = vm.addr(3);
 
-        MockTokenManagementModule tokenManagementModule = new MockTokenManagementModule(
+        MockExternalTokenTransferModule externalTokenTransferModule = new MockExternalTokenTransferModule(
             address(accessController),
             address(ipAccountRegistry),
             address(moduleRegistry)
         );
-        moduleRegistry.registerModule("MockTokenManagementModule", address(tokenManagementModule));
+        moduleRegistry.registerModule("MockExternalTokenTransferModule", address(externalTokenTransferModule));
         vm.prank(owner);
         ipAccount.execute(
             address(accessController),
@@ -1539,7 +1539,7 @@ contract AccessControllerTest is BaseTest {
             abi.encodeWithSignature(
                 "setPermission(address,address,address,bytes4,uint8)",
                 address(ipAccount),
-                address(tokenManagementModule),
+                address(externalTokenTransferModule),
                 address(mockNFT),
                 mockNFT.transferFrom.selector,
                 AccessPermission.ALLOW
@@ -1548,14 +1548,14 @@ contract AccessControllerTest is BaseTest {
         assertEq(
             accessController.getPermission(
                 address(ipAccount),
-                address(tokenManagementModule),
+                address(externalTokenTransferModule),
                 address(mockNFT),
                 mockNFT.transferFrom.selector
             ),
             AccessPermission.ALLOW
         );
         vm.prank(owner);
-        tokenManagementModule.transferERC721Token(
+        externalTokenTransferModule.transferERC721Token(
             payable(address(ipAccount)),
             anotherAccount,
             address(mockNFT),
@@ -1572,12 +1572,12 @@ contract AccessControllerTest is BaseTest {
 
         address anotherAccount = vm.addr(3);
 
-        MockTokenManagementModule tokenManagementModule = new MockTokenManagementModule(
+        MockExternalTokenTransferModule externalTokenTransferModule = new MockExternalTokenTransferModule(
             address(accessController),
             address(ipAccountRegistry),
             address(moduleRegistry)
         );
-        moduleRegistry.registerModule("MockTokenManagementModule", address(tokenManagementModule));
+        moduleRegistry.registerModule("MockExternalTokenTransferModule", address(externalTokenTransferModule));
         vm.prank(owner);
         ipAccount.execute(
             address(accessController),
@@ -1585,7 +1585,7 @@ contract AccessControllerTest is BaseTest {
             abi.encodeWithSignature(
                 "setPermission(address,address,address,bytes4,uint8)",
                 address(ipAccount),
-                address(tokenManagementModule),
+                address(externalTokenTransferModule),
                 address(mock1155),
                 mock1155.safeTransferFrom.selector,
                 AccessPermission.ALLOW
@@ -1594,14 +1594,14 @@ contract AccessControllerTest is BaseTest {
         assertEq(
             accessController.getPermission(
                 address(ipAccount),
-                address(tokenManagementModule),
+                address(externalTokenTransferModule),
                 address(mock1155),
                 mock1155.safeTransferFrom.selector
             ),
             AccessPermission.ALLOW
         );
         vm.prank(owner);
-        tokenManagementModule.transferERC1155Token(
+        externalTokenTransferModule.transferERC1155Token(
             payable(address(ipAccount)),
             anotherAccount,
             address(mock1155),
@@ -1617,12 +1617,12 @@ contract AccessControllerTest is BaseTest {
 
         address anotherAccount = vm.addr(3);
 
-        MockTokenManagementModule tokenManagementModule = new MockTokenManagementModule(
+        MockExternalTokenTransferModule externalTokenTransferModule = new MockExternalTokenTransferModule(
             address(accessController),
             address(ipAccountRegistry),
             address(moduleRegistry)
         );
-        moduleRegistry.registerModule("MockTokenManagementModule", address(tokenManagementModule));
+        moduleRegistry.registerModule("MockExternalTokenTransferModule", address(externalTokenTransferModule));
         vm.prank(owner);
         ipAccount.execute(
             address(accessController),
@@ -1630,7 +1630,7 @@ contract AccessControllerTest is BaseTest {
             abi.encodeWithSignature(
                 "setPermission(address,address,address,bytes4,uint8)",
                 address(ipAccount),
-                address(tokenManagementModule),
+                address(externalTokenTransferModule),
                 address(mock20),
                 mock20.transfer.selector,
                 AccessPermission.ALLOW
@@ -1639,14 +1639,19 @@ contract AccessControllerTest is BaseTest {
         assertEq(
             accessController.getPermission(
                 address(ipAccount),
-                address(tokenManagementModule),
+                address(externalTokenTransferModule),
                 address(mock20),
                 mock20.transfer.selector
             ),
             AccessPermission.ALLOW
         );
         vm.prank(owner);
-        tokenManagementModule.transferERC20Token(payable(address(ipAccount)), anotherAccount, address(mock20), 1e18);
+        externalTokenTransferModule.transferERC20Token(
+            payable(address(ipAccount)),
+            anotherAccount,
+            address(mock20),
+            1e18
+        );
         assertEq(mock20.balanceOf(anotherAccount), 1e18);
     }
 }
